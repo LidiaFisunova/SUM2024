@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>fantastic title</title>
+        <meta charset="unt-8" />
+        <link rel="icon" href="bubble_icon111.png">
+        <link rel="slylesheet" type="text/css" href="first_style.css">
+    </head>
+    <body>
+        <h1>title 1</h1>
+        text text
+        <p style="color:palevioletred; height: 10px;">
+            fantastic text
+            <br> <i>and italic</i>
+        </p>
+        <br>
+        <ol type="i" type="squere">
+            <span style="background-color: lightskyblue; color: navy;">
+            &xi;
+            &sim;
+            &sect;
+            </span>
+        </ol>
+        <table>
+            <thead>
+                table
+            </thead>
+            <tbody>
+                <tr> <td> &Sigma; </td> <td> &ni; </td></tr>
+                <tr> <td> &Omicron; </td> <td> &notin; </td></tr>
+            </tbody>
+        </table>
+        <canvas id="canvas" width="300px" height="300px" style="border: 2 px salmon;"> </canvas>
+        <script type="module">
+            import * as lift from "./library.js";
+            window.addEventListener("load", () => {
+                lift.initGL();
+
+                const draw = () => {
+                    lift.render();
+
+                    window.requestAnimationFrame(draw);
+                };
+                draw();
+            });
+        </script>
+    </body>
+</html>
