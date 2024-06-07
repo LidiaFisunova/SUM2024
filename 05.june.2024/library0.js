@@ -19,7 +19,7 @@ export function initGL() {
     {
         gl_Position = vec4(InPosition, 1);
         //gl_Position.x += 0.1 * sin(Time);
-        DrawPos = InPosition.xy;
+        DrawPos = InPosition.xy * 1.5;
     }
     `;
     let fs_txt =
@@ -30,28 +30,30 @@ export function initGL() {
     in vec2 DrawPos;
     uniform float Time;
     
-    float get_fractal(int x1, int y1)
+    float get_fractal(float x, float y)
     {
         int n = 0;
+        float x1 = x, y1 = y;
 
-        float x = float(x1) / 300.0 * 0.5 - 1.0;
-        float y = float(y1) / 300.0 * 0.5 - 1.0;
+        //x = x / 300.0 * 0.5 - 1.0;
+        //y = y / 300.0 * 0.5 - 1.0;
 
-        while (sqrt((x + y)(x - y)) < 2 && n < 255)
+        while (sqrt(x * x + y * y) < 2.0 && n < 255)
         {
-            x = (x + y)(x - y);
-            y = 2.0 * x * y;
-            x += 73.0, n++;
+            x1 = x;
+            x = (x + y) * (x - y);
+            y = 2.0 * x1 * y * cos(Time * 0.4) + 0.397 * sin(Time * 0.02) * cos(Time * 0.029);
+            x += 0.34, n++;
+            //n = 100 + n * 20;
         }
 
-        return n / 255.0;
+        return float(n) / 255.0;
     }
 
     void main( void )
     {
         float n = get_fractal(DrawPos.x, DrawPos.y);
-        OutColor = vec4(1.0 * sin(n * 8.0 + Time * 5.0) * sin(n * 8.0 + Time * 2.0), abs(sin(Time)), 1.0, 1.0);
-        //OutColor = vec4(1, 1, 0, 1);
+        OutColor = vec4(n, n * 0.76, n * 0.7, 1);
     }
     `;
     let 
@@ -65,7 +67,7 @@ export function initGL() {
     
     if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
         let buf = gl.getProgramInfoLog(prg);
-        console.log('Shader program link failed' + buf);
+        console.log('Shader program link failed: ' + buf);
     }
 
      // Vertex buffer creation
@@ -80,7 +82,7 @@ export function initGL() {
     if (posLoc != -1) {
         gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(posLoc);
-  }
+    }
 
     // Uniform data
     timeLoc = gl.getUniformLocation(prg, "Time");
@@ -88,13 +90,13 @@ export function initGL() {
 } // End of 'initGL' function
 
 // Load and compile shaders function
-export function loadShader(shaderType, shaderSource) {
+function loadShader(shaderType, shaderSource) {
     const shader = gl.createShader(shaderType);
     gl.shaderSource(shader, shaderSource);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         let buf = gl.getShaderInfoLog(shader);
-        console.log('Shader was not compiled' + buf);
+        console.log('Shader was not compiled: ' + buf);
     }
     return shader;
 }
@@ -106,11 +108,14 @@ export function render() {
 
     if (timeLoc != -1) {
         const date = new Date();
-        let t = date.getMinutes * 60 + date.getSeconds + date.getMilliseconds / 1000;
+        let t = date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() / 1000;
         gl.uniform1f(timeLoc, t);
     }
+    else {
+        console.log('timeLoc is -1');
+    }
 
-    gl.drawArrays(gl.TriangleStrip, 0, 4);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 
 console.log("library.js was imported");
