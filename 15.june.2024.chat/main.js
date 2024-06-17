@@ -2,7 +2,9 @@ import http from "node:http";
 import fs from "node:fs/promises";
 import process from "node:process";
 import express from "express";
+import { WebSocketServer } from "ws";
 
+/*
 const requestListener = async (req, res) => {
   if (req.url == "/") {
     const contests = await fs.readFile(process.cwd() + "/client/index.html");
@@ -18,11 +20,34 @@ const requestListener = async (req, res) => {
     }
   }
 };
+*/
 
 const app = express();
+
+app.get("/", (req, res, next) => {
+  counter = counter + 1;
+  next();
+})
+
+app.get("/getData", (req, res, next) => {
+  res.send(`data received: ${counter}`);
+})
+
 app.use(express.static("client"));
 
-const server = http.createServer(requestListener);
+let counter = 0;
+
+const server = http.createServer(app);
+
+const wss = new WebSocketServer({server});
+wss.on("connection", (ws) => {
+  ws.on("message", (message) => {
+    console.log(message.toString());
+    ws.send(`new message: ${message}`);
+  });
+
+  ws.send("new client connected");
+});
 
 const host = "localhost";
 const port = 8000;

@@ -28,44 +28,55 @@ function invertToBW() {
 //context.putImageData(pixels, 0, 0);
 function getSDF() {
   let p = pixels.data;
-  par = [];
-  pp = [];
-  for (const i = 0, j = 0; i < p.length - 1; i += 4) {
+  let par = [];
+  let pp = [];
+  let i, j;
+  for (i = 0, j = 0; i < p.length; i += 4) {
+    if (i % (imgW * 4) == 0 && i != 0) {
+      if (pp.length == 0)
+        continue;
+      par = par.concat([pp]);
+      pp = [];
+      j = 0;
+    }
+    if (p[i] == 255)
+      continue;
     if (p[i] == 0) {
-      pp[j] = [0, i];
+      pp[j] = [0, i % imgW];
       j++;
     }
-    if (i % imgW == 0) {
-      par.concat([pp]);
-      pp = [];
-    }
   }
-  i = 0;
-  for (j = 0; j < par.length; j++) {
-    a = par[j].length;
+
+  let s;
+  for (j = 25; j < par.length; j++) {
     pp = par[j];
-    while (1) {
+    i = 0;
+    while (pp.length > 1) {
+      if (i == pp.length - 1)
+        break;
       s = ((pp[i][1] * pp[i][1] * 2 - (pp[i + 1][1] * pp[i + 1][1] * 2)) / (2 * pp[i][1] - 2 * pp[i + 1][1]));
+      //console.log(`s${s}, ${pp[i][1]}`);
       if (pp[i][1] < s) {
         pp[i][0] = s;
         i++;
-        if (i == a)
-          break;
       }
+
       else {
-        pp.remove(pp[i]);
+        pp = pp.remove(pp[i]);
         i--;
       }
     }
   }
-  const k = 0;
-  for (i = 0, j = 0; i < p.length - 1; i += 4) {
-    if (i % imgW == 0)
+  
+  let k = 0;
+  for (i = 0, j = 0; i < p.length; i += 4) {
+    if (i % imgW == 0 && i != 0)
       k++;
-    if (par[k][j][1] < i)
+    if (par[k].length > j + 1 && par[k][j][0] < i)
       j++;
-    let r = par[k][j][1] - i;
-    let r2 = r * r / 3;
+    console.log(par[k][j], i);
+    let r = par[k][j][0] - i;
+    let r2 = (r * r / 3); 
     p[i] = r2, p[i + 1] = r2, p[i + 2] = r2;
   }
 }
@@ -81,5 +92,5 @@ window.addEventListener("load", () => {
   context.putImageData(pixels, 0, 0);
 
   getSDF();
-  context.putImageData(pixels, 0, 0);
+  context.putImageData(pixels, 0, 0); 
 });

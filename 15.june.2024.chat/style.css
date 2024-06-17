@@ -1,0 +1,8 @@
+p {
+  background-color:khaki;
+  border: 1px crimson;
+  margin: 5px;
+  border-radius: 5px;
+  display: inline-flex;
+  background-image: url("https://www.geaves.com/media/catalog/product/cache/acd115faf6a75f6594ab269049b631ed/3/1/3133_7.webp");
+}
