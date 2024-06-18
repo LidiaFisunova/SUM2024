@@ -355,7 +355,7 @@ class _mat4 {
 
   //Rotation matrix
   matrRotate(angle, v) {
-    let a = D2R(angle),
+    let a = angle * 3.1415926535897932 / 180,
       s = Math.sin(a),
       c = Math.cos(a);
 
@@ -423,8 +423,8 @@ class _mat4 {
   }
 
   //Ratation by X matrix
-  MatrRotateX(angleInDegree) {
-    let a = Math.D2R(angleInDegree),
+  matrRotateX(angleInDegree) {
+    let a = angleInDegree * 3.1415926535897932 / 180,
       si = Math.sin(a),
       co = Math.cos(a),
       m = new _mat4();
@@ -435,11 +435,12 @@ class _mat4 {
       [0, -si, co, 0],
       [0, 0, 0, 1],
     ];
+    return m;
   }
 
   //Rotation by Y matrix
-  MatrRotateY(angleInDegree) {
-    let a = Math.D2R(angleInDegree),
+  matrRotateY(angleInDegree) {
+    let a = angleInDegree * 3.1415926535897932 / 180,
       si = Math.sin(a),
       co = Math.cos(a),
       m = new _mat4();
@@ -454,8 +455,8 @@ class _mat4 {
   }
 
   //Rotation by Z matrix
-  MatrRotateY(angleInDegree) {
-    let a = Math.D2R(angleInDegree),
+  matrRotateZ(angleInDegree) {
+    let a = angleInDegree * 3.1415926535897932 / 180,
       si = Math.sin(a),
       co = Math.cos(a),
       m = new _mat4();

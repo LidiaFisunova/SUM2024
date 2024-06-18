@@ -1,18 +1,16 @@
-import { vec3 } from "../mth/vec3.js";
-
-export function cubeCreate(pos, side) {
+export function cubeCreate() {
   /* let sx = 0 + side,
     sy = pos.y + side,
     sz = pos.z - side; */
   let p = [
-    [pos.x, pos.y, pos.z],
-    [1, 0, 0],
-    [1, 1, 0],
-    [0, 1, 0],
-    [0, 1, -1],
-    [1, 1, -1],
-    [1, 0, -1],
-    [0, 0, -1],
+    [-0.5, -0.5, 0.5],
+    [0.5, -0.5, 0.5],
+    [0.5, 0.5, 0.5],
+    [-0.5, 0.5, 0.5],
+    [-0.5, 0.5, -0.5],
+    [0.5, 0.5, -0.5],
+    [0.5, -0.5, -0.5],
+    [-0.5, -0.5, -0.5],
   ];
 
   let n = [
@@ -46,7 +44,7 @@ export function cubeCreate(pos, side) {
   }
   let ind = [
     2, 11, 5, 8, 6, 3, 15, 18, 19, 22, 4, 1, 0, 9, 21, 12, 14, 17, 23, 20, 23,
-    14, 17, 18, 13, 7, 10,
+    14, 17, 16, 13, 7, 10,
   ];
 
   vertexes = [

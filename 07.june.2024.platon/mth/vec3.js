@@ -1,12 +1,12 @@
 class _vec3 {
   constructor(x, y, z) {
-    if (typeof x != "number") {
+    if (typeof(x) != "number") {
       if (x == undefined) {
         return;
       }
-      (this.x = obj.x), (this.y = obj.y), (this.z = obj.z);
+      (this.x = x.x), (this.y = x.y), (this.z = x.z);
     }
-    if (typeof y != undefined && typeof z != undefined)
+    else if (y != undefined && z != undefined)
       (this.x = x), (this.y = y), (this.z = z);
     else (this.x = x), (this.y = x), (this.z = x);
   }
