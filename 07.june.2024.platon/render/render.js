@@ -1,6 +1,7 @@
 import { primCreate } from "../prims/prim.js";
 import { mat4 } from "../mth/mat4.js";
 import { vec3 } from "../mth/vec3.js";
+import { timer } from "../time/timer.js";
 
 class _render {
   constructor(canvas) {
@@ -9,7 +10,7 @@ class _render {
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.clearColor(0.9, 0.7, 0.7, 1);
     this.prg = this.gl.createProgram();
-
+    this.timer = timer();
     this.prims = [];
   }
 
@@ -36,19 +37,13 @@ class _render {
       return;
     let timeLoc = shd.uniforms["Time"].loc;
 
-    if (timeLoc != -1) {
-      const date = new Date();
-      let t =
-        date.getMinutes() * 60 +
-        date.getSeconds() +
-        date.getMilliseconds() / 1000;
-      this.gl.uniform1f(timeLoc, t);
+    this.gl.uniform1f(timeLoc, this.timer.globalTime);
     }
-  }
+  
 
   render() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    
+    this.timer.response();
     for (const p of this.prims) {
       if (
         p.mtl.shader.id != null &&
@@ -59,7 +54,7 @@ class _render {
         p.mtl.shader.apply();
         this.programUniforms(p.mtl.shader);
         this.transformProgramUniforms(p.mtl.shader);
-        p.render();
+        p.render(this.timer);
         p.shdIsLoaded = 1;
         return;
       }

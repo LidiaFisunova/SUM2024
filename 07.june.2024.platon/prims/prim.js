@@ -27,26 +27,21 @@ class _prim {
     this.gl = gl;
   }
 
-  updatePrimData() {
+  updatePrimData(timer) {
     //let mr = mat4().matrRotateX(30);
-    const date = new Date();
-    let t =
-      date.getMinutes() * 60 +
-      date.getSeconds() +
-      date.getMilliseconds() / 1000;
 
     let mr = mat4().matrScale(vec3(this.side));
-    let m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * t));
+    let m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * removeEventListener.globalTime));
     let arr1 = m1.toArray();
     let mWLoc = this.mtl.shader.uniforms["matrWorld"].loc;
     this.gl.uniformMatrix4fv(mWLoc, false, arr1);
   }
 
-  render() {
+  render(timer) {
     let gl = this.gl;
     if (this.noofI != null) {
       if (this.mtl.shdIsLoaded == null) {
-        this.updatePrimData();
+        this.updatePrimData(timer);
         this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
         this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
         this.mtl.shader.updateShaderData();
@@ -57,7 +52,7 @@ class _prim {
       gl.drawElements(gl.TRIANGLE_STRIP, this.noofI, gl.UNSIGNED_INT, 0);
     } else {
       if (this.mtl.shdIsLoaded == null) {
-        this.updatePrimData();
+        this.updatePrimData(timer);
         this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
         this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
         this.mtl.shader.updateShaderData();
