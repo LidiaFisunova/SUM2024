@@ -3,16 +3,154 @@
   <head>
     <title>fantastic title</title>
     <meta charset="unt-8" />
-    <link rel="icon" href="../bubble_icon111.png" />
+    <link rel="icon" href="./bubble_icon111.png" />
     <link rel="slylesheet" type="text/css" href="style.css" />
     <script src="./index.js" type="module"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+      #panel {
+        border: 1px solid rgb(71, 10, 10);
+        border-radius: 5%;
+        border-top-right-radius: 7%;
+        width: 90px;
+        height: 30px;
+        border-block-width: 2px;
+        background-color: rgb(223, 210, 236);
+      }
+      .btn {
+        min-width: 300px;
+      }
+      .btn:before {
+        content: "  \1F839 ";
+        float: right;
+      }
+      .active:before {
+        content: "\23F7"; /*   \23F7  \1F83B */
+        float: right;
+        font-size: 1.0em;
+        vertical-align: top;
+        position: relative;
+        /*left: 50px;
+        top: 50px;*/
+        width: 1.3em;
+        height: 1.3em;
+        background-image: url('https://www.britannica.com/science/mountain-landform');
+        background-size: 1.3em 1.3em;
+        box-shadow: 1px 1px 5px #000;
+      }
+      .message_list {
+        padding: 8px;
+        border: solid 3px rgb(50, 50, 139);
+        border-radius: 8px;
+        box-shadow: inset 10px 10px 30px rgba(0, 0, 0, 0.3),
+                    inset 2px 2px 3px rgba(0,0,0,.5),
+                    3px 3px 5px rgba(0, 0, 0, 0.4),
+                    10px 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .message_body {
+        border: #635a5a 1px solid;
+        border-width: 0px 1px 1px 1px;
+        background-color: rgb(229, 175, 187);
+      }
+      .message_head:before {
+        content: "\1F89A"
+      }
+      .message_head:after {
+        content: "\1F898";
+        float: right;
+      }
+      .message_head_collapse:after {
+        content: "\23F7";
+        float: right;
+      }
+      .message_head {
+        cursor: grab;
+        font-weight: bold;
+        background: linear-gradient(0deg, rgb(158, 106, 117), #AAA 80%) no-repeat;
+        border: #635a5a 1px solid;
+        border-width: 1px 1px 0px 1px;
+      }
+      #nic {
+        width: 47%;
+      }
+      .msg {
+        border: 1px solid #EEE;
+        margin: 0px;
+        padding: 8px;
+        border-radius: 0px 30px 30px 30px;
+        border-color: rgb(52, 196, 136)
+      }
+    </style>
+  </head>
+   
+  <body>
+    <h3></h3>
+    <img src="../bubble_icon111.png" width="130px" height="100px" />
+    <br /><button class="btn">слайд</button>
+    <div id="panel">
+      <i>server chat</i>
+    </div>
+    <i>
+    <p>
+    Nic <input id="nic" type="text" placeholder="введите имя" value=""/>
+    <br />Message:
+    <br /><textarea id="txt" placeholder="введите текст сообщения"></textarea>
+    <br /><input id="send" type="button" value="послать" />
+    <input id="collapse" type="button" value="свернуть/развернуть все" />
+    <input id="fillrand" type="button" value="вставить что-нибудь" />
+    <div id="mlist" class="message_list">Сообщения</div>
+    </i>
   </head>
   <body>
-    <h1>title 1</h1>
-    text text
     <p style="color: palevioletred; height: 10px" id="dataField"> </pp>
     </p>
-      <input type="text" id="message" value="" size="5">
+      <textarea id="message" placeholder="кря"> </textarea>
     </p>
+  <script>
+    $(document).ready(function() {
+      // Initial deals            
+      $("body").css("background-color", "#CED");
+      
+      $(".btn").click(() => {
+        $("#panel").slideToggle("slow");
+        $(".btn").toggleClass("active");
+      });
+ 
+      $("#send").click((e) => {
+        /// const setHandlers = () => {
+        ///   $(".message_head").off("click");
+        ///   $(".message_head").click(e => {
+        ///     $(e.target).next().slideToggle("fast");
+        ///     return false;
+        ///   });
+        /// };
+        let msg = $('<div class="message_entry"></div>');
+ 
+        msg.html("<div class='message_head'>" + $("#nic").val() + " :: " + t + "</div><div class='message_body'><div class='msg'>" + $("#txt").val() + "</div></div>");
+        msg.click(e => {
+          $(e.target).next().slideToggle("fast");
+          $(e.target).toggleClass("message_head_collapse");
+          return false;
+        }); 
+        //$("#mlist").append(msg);
+        //$("#mlist").prepend(msg).animate(1000);
+        msg.slideUp().prependTo("#mlist").slideDown("slow");
+        $("#txt").val("");
+        // setHandlers();
+      });
+    
+      $("#collapse").click(e => {
+        $(".message_body").slideToggle(1000);
+      });
+      // Fill samples
+      $("#nic").val("Вася");
+      $("#fillrand").click();
+      $("#send").click();
+      $("#nic").val("Петя");
+      $("#fillrand").click();
+      $("#send").click();
+      $("#nic").val("Кто-то");
+    });
+  </script>
   </body>
 </html>

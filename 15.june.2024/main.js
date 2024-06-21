@@ -68,7 +68,7 @@ function getSDF1() {
     if (par[k][j][0] != 0 && par[k][j][0] < i % (imgW * 4))
       j++;
     let r = par[k][j][1] - i % (imgW * 4);
-    let r2 = (r * r / 50);
+    let r2 = (r * r);
     p[i] = r2, p[i + 1] = r2, p[i + 2] = r2;
   }
 }
@@ -79,16 +79,19 @@ function getSDF2() {
   let p = pixels.data;
   let par = [];
   let pp = [];
-  let i, j, x;
-  for (i = 0, x = 0; i < imgH; i++) {
-    for (j = 0; j < imgW * 4; j += 4) {  
-      if (p[i * imgH * 4 + j] == 255)
+  let i, j, x, l;
+  for (i = 0; i < imgW * 4; i += 4) {
+    for (j = 0, l = 0, x = 0; j < imgH; j++) {
+      if (p[j * imgW * 4 + i] == 255) {
+        l++;
         continue;
-      pp[x] = [0, i * imgH * 4 + j, p[i * imgH * 4 + j]]; // 0 - intersection, x, y
+      }
+      pp[x] = [0, l * 4, p[j * imgW * 4 + i]]; // 0 - intersection, x, y
       x++;
+      l++;
     }
     par = par.concat([pp]);
-    pp = [], x = 0;
+    pp = [];
   }
 
   let s;
@@ -97,8 +100,10 @@ function getSDF2() {
     pp = par[j];
     i = 0;
     len = pp.length;
-    while (pp.length > 0) {
-      console.log(pp[i], i);
+    while (i > 0) {
+      //console.log(pp[i], i);
+      //if (pp[i] == undefined)
+      //  pp[i] = [1, 1, 1];
       s = ((pp[i][2] + pp[i][1] * pp[i][1] - (pp[i + 1][2] + pp[i + 1][1] * pp[i + 1][1])) / (2 * pp[i][1] - 2 * pp[i + 1][1]));
       if (pp[i][1] < s) {
         pp[i][0] = s;
@@ -115,25 +120,28 @@ function getSDF2() {
   let k = 0;
   j = 0;
 
-  for (i = 0, x = 0; i < imgH; i++) {
-    for (let h = 0; h < imgW * 4; h += 4) {  
-      console.log(par[k][j], "k:", k, "j:", j, "i:", i);
+  for (i = 0, x = 0; i < imgW * 4; i += 4) {
+    for (let h = 0, l = 0; h < imgH; h++) {  
+      //console.log(par[k][j], "k:", k, "j:", j, "i:", i);
       if (par[k] == undefined || par[k].length == 0) {
+        l++;
         continue;
       }
-      if (par[k][j][0] != 0 && par[k][j][0] < i % (imgH * 4))
+      if (par[k][j][0] != 0 && par[k][j][0] < l)
         j++;
-      x = i * imgH * 4 + h;
+      x = h * imgW * 4 + i;
       if (p[x] > 255)
         p[x] = 0;
-      let r = par[k][j][1] - h;
-      let r2 = (r * r / 50) + p[x];
+      let r = par[k][j][1] - l * 4;
+      //console.log(par[k][j][1], l);
+      let r2 = ((r * r) / 1000 + p[x]) / 10;
       p[x] = r2, p[x + 1] = r2, p[x + 2] = r2;
+      l++;
     }
     k++;
   }
 }
-
+ 
 window.addEventListener("load", () => {
   canvas.width = imgW * 3;
   canvas.height = imgH;

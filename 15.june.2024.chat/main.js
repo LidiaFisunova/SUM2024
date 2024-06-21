@@ -30,7 +30,7 @@ app.get("/", (req, res, next) => {
 })
 
 app.get("/getData", (req, res, next) => {
-  res.send(`data received: ${counter}`);
+  res.send(`new message mfimfowld send pls: ${counter}`);
 })
 
 app.use(express.static("client"));

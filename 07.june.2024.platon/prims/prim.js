@@ -28,10 +28,9 @@ class _prim {
   }
 
   updatePrimData(timer) {
-    //let mr = mat4().matrRotateX(30);
 
     let mr = mat4().matrScale(vec3(this.side));
-    let m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * removeEventListener.globalTime));
+    let m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime));
     let arr1 = m1.toArray();
     let mWLoc = this.mtl.shader.uniforms["matrWorld"].loc;
     this.gl.uniformMatrix4fv(mWLoc, false, arr1);
