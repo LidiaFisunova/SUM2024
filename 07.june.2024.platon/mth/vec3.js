@@ -12,53 +12,53 @@ class _vec3 {
   }
 
   //Vector3 add another
-  vec3AddVec3(v) {
+  add(v) {
     return new _vec3(this.x + v.x, this.y + v.y, this.z + v.z);
   }
 
   //Vector3 substract another
-  vec3SubVec3(v) {
+  sub(v) {
     return new _vec3(this.x - v.x, this.y - v.y, this.z - v.z);
   }
 
   //Vector3 multiplicated by number
-  vec3MulNum(n) {
+  mulNum(n) {
     return new _vec3(this.x * n, this.y * n, this.z * n);
   }
 
   //Vector3 devided by number
-  vec3DivNum(n) {
+  divNum(n) {
     if (n == 0) return;
     return new _vec3(this.x / n, this.y / n, this.z / n);
   }
 
   //Vector3 Negative
-  vec3Neg() {
+  neg() {
     return new _vec3(-this.x, -this.y, -this.z);
   }
 
   //Two vectors3 dot product
-  vec3DotVec3(v) {
+  dot(v) {
     return this.x * v.x + this.y * v.y + this.z * v.z;
   }
 
   //Vector3 Lenght evaluation
-  vec3Len() {
-    let len = this.vec3DotVec3(this);
+  len() {
+    let len = this.dot(this);
     if (len == 0 || len == 1) return len;
     return Math.sqrt(len);
   }
 
   //Vector3 Normalize
-  vec3Normalize() {
-    let len = this.vec3DotVec3(this);
+  normalize() {
+    let len = this.dot(this);
 
     if (len == 1 || len == 0) return this;
-    return this.vec3DivNum(Math.sqrt(len));
+    return this.divNum(Math.sqrt(len));
   }
 
   //Vector3 transfomation
-  vec3Transform(m) {
+  transform(m) {
     return new _vec3(
       this.x * m.a[0][0] + this.y * m.a[1][0] + this.z * m.a[2][0],
       this.x * m.a[0][1] + this.y * m.a[1][1] + this.z * m.a[2][1],
@@ -79,7 +79,7 @@ class _vec3 {
   }
 
   //Cross product of two vectors
-  vec3CrossVec3(v) {
+  cross(v) {
     return new _vec3(
       this.y * v.z - this.z * v.y,
       this.z * v.x - this.x * v.z,
@@ -90,9 +90,9 @@ class _vec3 {
   //Point by matrix transformation
   pointTransform(m) {
     let v = new _vec3(
-      this.x * m.a[0][0] + this.y * m.a[1][0] + V.Z * m.a[2][0] + m.a[3][0],
-      this.x * m.a[0][1] + this.y * m.a[1][1] + V.Z * m.a[2][1] + m.a[3][1],
-      this.x * m.a[0][2] + this.y * m.a[1][2] + V.Z * m.a[2][2] + m.a[3][2]
+      this.x * m.a[0][0] + this.y * m.a[1][0] + v.z * m.a[2][0] + m.a[3][0],
+      this.x * m.a[0][1] + this.y * m.a[1][1] + v.z * m.a[2][1] + m.a[3][1],
+      this.x * m.a[0][2] + this.y * m.a[1][2] + v.z * m.a[2][2] + m.a[3][2]
     );
 
     return v;

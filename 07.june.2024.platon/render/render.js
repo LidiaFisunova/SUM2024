@@ -2,16 +2,20 @@ import { primCreate } from "../prims/prim.js";
 import { mat4 } from "../mth/mat4.js";
 import { vec3 } from "../mth/vec3.js";
 import { timer } from "../time/timer.js";
+import { input_init } from "../mth/input.js";
 
 class _render {
-  constructor(canvas) {
+  constructor(canvas, name, camera) {
     this.canvas = canvas;
+    this.name = name;
     this.gl = canvas.getContext("webgl2");
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.clearColor(0.9, 0.7, 0.7, 1);
     this.prg = this.gl.createProgram();
     this.timer = timer();
     this.prims = [];
+    this.input = input_init(this);
+    this.cam = camera;
   }
 
   primAttach(name, type, shd_name, pos, side=3) {
@@ -20,14 +24,13 @@ class _render {
   }
 
   programUniforms(shd) {
-    let m = mat4().matrView(vec3(5, 3, 5), vec3(0, 0, 0), vec3(0, 1, 0));
-    let arr = m.toArray();
+    //let m = mat4().matrView(vec3(5, 3, 5), vec3(0, 0, 0), vec3(0, 1, 0));
+    let arr = this.cam.matrView.toArray();
     let mVLoc = shd.uniforms["matrView"].loc;
     this.gl.uniformMatrix4fv(mVLoc, false, arr);
 
-    let m1 = mat4().MatrFrustum(-0.08, 0.08, -0.08, 0.08, 0.1, 200);
-    //let m1 = mat4().matrOrtho(-3, 3, -3, 3, -3, 3);
-    let arr1 = m1.toArray();
+    //let m1 = mat4().matrFrustum(-0.08, 0.08, -0.08, 0.08, 0.1, 200);
+    let arr1 = this.cam.matrProj.toArray();
     let mPLoc = shd.uniforms["matrProj"].loc;
     this.gl.uniformMatrix4fv(mPLoc, false, arr1);
   }
@@ -44,6 +47,7 @@ class _render {
   render() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     this.timer.response();
+    this.input.responseCamera(this);
     for (const p of this.prims) {
       if (
         p.mtl.shader.id != null &&
@@ -51,6 +55,7 @@ class _render {
         p.mtl.shader.shaders[1].id != null &&
         p.shdIsLoaded == null
       ) {
+        this.input.reset();
         p.mtl.shader.apply();
         this.programUniforms(p.mtl.shader);
         this.transformProgramUniforms(p.mtl.shader);
@@ -60,11 +65,11 @@ class _render {
       }
       if (p.shdIsLoaded == null) return;
       this.transformProgramUniforms(p.mtl.shader);
-      p.render();
+      p.render(this.timer);
     }
   }
 }
 
-export function renderCreate(canvas) {
-  return new _render(canvas);
+export function renderCreate(canvas, name, camera) {
+  return new _render(canvas, name, camera);
 }

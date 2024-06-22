@@ -1,4 +1,4 @@
-//import {vec3} from "./prims/vec3"
+import {vec3} from "./vec3"
 
 class _mat4 {
   constructor() {
@@ -132,7 +132,7 @@ class _mat4 {
 
   //Multiplying three matrixes
   matrMulMatr3(m1, m2) {
-    return this.matrMulMatr2(matrMulMatr(this.a, m1), m2);
+    return this.matrMulMatr2(m1.matrMulMatr2(m2));
   }
 
   MatrInverse() {
@@ -362,21 +362,21 @@ class _mat4 {
     let r = new _mat4();
     r.a = [
       [
-        c + v.X * v.X * (1 - c),
-        v.Y * v.X * (1 - c) - v.Z * s,
-        v.Z * v.X * (1 - c) + v.Y * s,
+        c + v.x * v.x * (1 - c),
+        v.y * v.x * (1 - c) - v.z * s,
+        v.z * v.x * (1 - c) + v.y * s,
         0,
       ],
       [
-        v.X * v.Y * (1 - c) + v.Z * s,
-        c + v.Y * v.Y * (1 - c),
-        v.Z * v.Y * (1 - c) - v.X * s,
+        v.x * v.y * (1 - c) + v.z * s,
+        c + v.y * v.y * (1 - c),
+        v.z * v.y * (1 - c) - v.x * s,
         0,
       ],
       [
-        v.X * v.Z * (1 - c) - v.Y * s,
-        v.Y * v.Z * (1 - c) + v.X * s,
-        c + v.Z * v.Z * (1 - c),
+        v.x * v.z * (1 - c) - v.y * s,
+        v.y * v.z * (1 - c) + v.x * s,
+        c + v.z * v.z * (1 - c),
         0,
       ],
       [0, 0, 0, 1],
@@ -386,21 +386,21 @@ class _mat4 {
 
   //View matrix
   matrView(loc, at, up1) {
-    let dir = at.vec3SubVec3(loc).vec3Normalize(),
-      right = dir.vec3CrossVec3(up1).vec3Normalize(),
-      up = right.vec3CrossVec3(dir).vec3Normalize();
+    let dir = at.sub(loc).normalize(),
+      right = dir.cross(up1).normalize(),
+      up = right.cross(dir).normalize();
     let m = new _mat4();
     m.a = [
       [right.x, up.x, -dir.x, 0],
       [right.y, up.y, -dir.y, 0],
       [right.z, up.z, -dir.z, 0],
-      [-loc.vec3DotVec3(right), -loc.vec3DotVec3(up), loc.vec3DotVec3(dir), 1],
+      [-loc.dot(right), -loc.dot(up), loc.dot(dir), 1],
     ];
     return m;
   }
 
   //Frustum matrix
-  MatrFrustum(l, r, b, t, n, f) {
+  matrFrustum(l, r, b, t, n, f) {
     let m = new _mat4();
     m.a = [
       [(2 * n) / (r - l), 0, 0, 0],
@@ -494,6 +494,16 @@ class _mat4 {
     ];
     return m;
   }
+  //Point by matrix transformation
+  transformPoint(v) {
+    let ve = vec3(
+      v.x * this.a[0][0] + v.y * this.a[1][0] + v.z * this.a[2][0] + this.a[3][0],
+      v.x * this.a[0][1] + v.y * this.a[1][1] + v.z * this.a[2][1] + this.a[3][1],
+      v.x * this.a[0][2] + v.y * this.a[1][2] + v.z * this.a[2][2] + this.a[3][2]
+    );
+
+    return ve;
+  }
 }
 
 function matrDeterm3x3(a11, a12, a13, a21, a22, a23, a31, a32, a33) {
@@ -509,7 +519,7 @@ function matrDeterm3x3(a11, a12, a13, a21, a22, a23, a31, a32, a33) {
 
 function matrDeterm(m) {
   let d =
-    +m.a[0][0] *
+    +this.a[0][0] *
       matrDeterm3x3(
         m.a[1][1],
         m.a[1][2],
