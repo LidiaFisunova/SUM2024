@@ -95,25 +95,28 @@ function getSDF2() {
   }
 
   let s;
-  let len;
-  for (j = 0; j < par.length; j++) {
+  let len, last_intersection;
+  for (j = 6; j < par.length; j++) {
     pp = par[j];
     i = 0;
     len = pp.length;
-    while (i > 0) {
+    last_intersection = 0;
+    while (i >= 0) {
       //console.log(pp[i], i);
       //if (pp[i] == undefined)
       //  pp[i] = [1, 1, 1];
       s = ((pp[i][2] + pp[i][1] * pp[i][1] - (pp[i + 1][2] + pp[i + 1][1] * pp[i + 1][1])) / (2 * pp[i][1] - 2 * pp[i + 1][1]));
-      if (pp[i][1] < s) {
-        pp[i][0] = s;
+      if (last_intersection < s) {
+        pp[i][0] = last_intersection = s;
         i++;
       }
       else {
-        pp.pop(i);
+        pp.splice(i, 1);
         i--;
+        console.log(i, j, pp[i]);
+        //pp[i][0] = last_intersection = s;
       }
-      if (pp.length == len)
+      if (pp.length == i + 1)
         break;
     }
   }

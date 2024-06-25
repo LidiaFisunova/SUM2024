@@ -1,5 +1,6 @@
 import { index_buffer, vertex_buffer } from "../UBO/ubo.js";
 import { cubeCreate } from "./cube.js";
+import { earthCreate } from "./earth.js";
 import { shader } from "../shd/shader.js";
 import { mat4 } from "../mth/mat4.js";
 import { vec3 } from "../mth/vec3.js";
@@ -25,12 +26,21 @@ class _prim {
     this.noofI = noofI;
     this.noofV = noofV;
     this.gl = gl;
+    this.matrWourld = mat4();
   }
 
   updatePrimData(timer) {
 
-    let mr = mat4().matrScale(vec3(this.side));
-    let m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime));
+    if (this.mtl.shader.uniforms["matrWorld"] == undefined)
+      return;
+    let mr, m1;
+    if (this.type == "earth") {
+      m1 = mat4().matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime)).matrMulMatr2(mat4().matrScale(vec3(3, 3, 3)));  
+    }
+    else {
+      mr = mat4().matrScale(vec3(this.side));
+      m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime));
+    }
     let arr1 = m1.toArray();
     let mWLoc = this.mtl.shader.uniforms["matrWorld"].loc;
     this.gl.uniformMatrix4fv(mWLoc, false, arr1);
@@ -41,8 +51,12 @@ class _prim {
     if (this.noofI != null) {
       if (this.mtl.shdIsLoaded == null) {
         this.updatePrimData(timer);
-        this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
-        this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
+        if (this.mtl.shader.attrs["InNormal"] == undefined)
+          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 12, 0);
+        else {
+          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
+          this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
+        }
         this.mtl.shader.updateShaderData();
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, this.VBuf.id);
@@ -52,8 +66,12 @@ class _prim {
     } else {
       if (this.mtl.shdIsLoaded == null) {
         this.updatePrimData(timer);
-        this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
-        this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
+        if (this.mtl.shader.attrs["InNormal"] == undefined)
+          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 12, 0);
+        else {
+          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
+          this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
+        }
         this.mtl.shader.updateShaderData();
       }
       gl.bindVertexArray(this.VA.id);
@@ -76,14 +94,17 @@ export function vrt(pos, norm) {
 export function primCreate(name, type, mtl, pos, side=3, gl) {
   let vi;
   if (type == "cube") vi = cubeCreate();
+  if (type == "earth") vi = earthCreate();
   let vert = vi[0],
     ind = vi[1];
 
   let vertexArray = gl.createVertexArray();
   gl.bindVertexArray(vertexArray);
-  let vertexBuffer = vertex_buffer(vert, gl);
+  let vertexBuffer = vertex_buffer(vert, gl), indexBuffer, indlen;
 
-  let indexBuffer = index_buffer(ind, gl);
+  if (ind != null)
+    indexBuffer = index_buffer(ind, gl), indlen = ind.length;
+  else indexBuffer = null, indlen = null;
 
   return new _prim(
     gl,
@@ -94,7 +115,7 @@ export function primCreate(name, type, mtl, pos, side=3, gl) {
     vertexBuffer,
     indexBuffer,
     vertexArray,
-    ind.length,
+    indlen,
     vert.length,
     side
   );

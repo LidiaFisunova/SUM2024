@@ -337,10 +337,11 @@ export class input {
         rnd.cam.loc = rnd.cam.loc.add(dv);
       }
 
+      let loc = mat4().matrRotate(elevator, vec3(1, 0, 0)).matrMulMatr2(
+                      mat4().matrRotate(azimuth, vec3(0, 1, 0)).matrMulMatr2( 
+                        mat4().matrTranslate(rnd.cam.at))).transformPoint(vec3(0, Dist, 0))
       /* Setup result camera */
-      rnd.cam = rnd.cam.camSet(mat4().matrRotate(elevator, vec3(1, 0, 0)).matrMulMatr2(
-                          matrRotate(azimuth, vec3(0, 1, 0)).matrMulMatr2( 
-                          matrTranslate(rnd.cam.at))).transformPoint(vec3(0, Dist, 0)),
+      rnd.cam = rnd.cam.camSet(loc,
                           rnd.cam.at,
                           vec3(0, 1, 0)
                           );

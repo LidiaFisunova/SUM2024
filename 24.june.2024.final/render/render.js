@@ -24,15 +24,19 @@ class _render {
   }
 
   programUniforms(shd) {
-    //let m = mat4().matrView(vec3(5, 3, 5), vec3(0, 0, 0), vec3(0, 1, 0));
-    let arr = this.cam.matrView.toArray();
-    let mVLoc = shd.uniforms["matrView"].loc;
-    this.gl.uniformMatrix4fv(mVLoc, false, arr);
+    if (shd.uniforms["matrView"] != undefined) {
+      //let m = mat4().matrView(vec3(5, 3, 5), vec3(0, 0, 0), vec3(0, 1, 0));
+      let arr = this.cam.matrView.toArray();
+      let mVLoc = shd.uniforms["matrView"].loc;
+      this.gl.uniformMatrix4fv(mVLoc, false, arr);
+    }
 
-    //let m1 = mat4().matrFrustum(-0.08, 0.08, -0.08, 0.08, 0.1, 200);
-    let arr1 = this.cam.matrProj.toArray();
-    let mPLoc = shd.uniforms["matrProj"].loc;
-    this.gl.uniformMatrix4fv(mPLoc, false, arr1);
+    if (shd.uniforms["matrView"] != undefined) {
+      //let m1 = mat4().matrFrustum(-0.08, 0.08, -0.08, 0.08, 0.1, 200);
+      let arr1 = this.cam.matrProj.toArray();
+      let mPLoc = shd.uniforms["matrProj"].loc;
+      this.gl.uniformMatrix4fv(mPLoc, false, arr1);
+    }    
   }
 
   transformProgramUniforms(shd) {
@@ -64,6 +68,7 @@ class _render {
         return;
       }
       if (p.shdIsLoaded == null) return;
+      p.mtl.shader.apply();
       this.transformProgramUniforms(p.mtl.shader);
       p.render(this.timer);
     }
