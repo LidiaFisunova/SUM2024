@@ -10,7 +10,7 @@ class _render {
     this.name = name;
     this.gl = canvas.getContext("webgl2");
     this.gl.enable(this.gl.DEPTH_TEST);
-    this.gl.clearColor(0.9, 0.7, 0.7, 1);
+    this.gl.clearColor(0.0, 0.0, 0.1, 1);
     this.prg = this.gl.createProgram();
     this.timer = timer();
     this.prims = [];
@@ -18,8 +18,8 @@ class _render {
     this.cam = camera;
   }
 
-  primAttach(name, type, shd_name, pos, side=3) {
-    let p = primCreate(name, type, shd_name, pos, side, this.gl);
+  primAttach(name, type, mtl, pos, side = 3) {
+    let p = primCreate(name, type, mtl, pos, side, this.gl);
     this.prims[this.prims.length] = p;
   }
 
@@ -31,22 +31,20 @@ class _render {
       this.gl.uniformMatrix4fv(mVLoc, false, arr);
     }
 
-    if (shd.uniforms["matrView"] != undefined) {
+    if (shd.uniforms["matrProj"] != undefined) {
       //let m1 = mat4().matrFrustum(-0.08, 0.08, -0.08, 0.08, 0.1, 200);
       let arr1 = this.cam.matrProj.toArray();
       let mPLoc = shd.uniforms["matrProj"].loc;
       this.gl.uniformMatrix4fv(mPLoc, false, arr1);
-    }    
+    }
   }
 
   transformProgramUniforms(shd) {
-    if (shd.uniforms["Time"] == undefined)
-      return;
+    if (shd.uniforms["Time"] == undefined) return;
     let timeLoc = shd.uniforms["Time"].loc;
 
     this.gl.uniform1f(timeLoc, this.timer.globalTime);
-    }
-  
+  }
 
   render() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -60,7 +58,7 @@ class _render {
         p.shdIsLoaded == null
       ) {
         this.input.reset();
-        p.mtl.shader.apply();
+        p.mtl.apply();
         this.programUniforms(p.mtl.shader);
         this.transformProgramUniforms(p.mtl.shader);
         p.render(this.timer);
@@ -68,7 +66,7 @@ class _render {
         return;
       }
       if (p.shdIsLoaded == null) return;
-      p.mtl.shader.apply();
+      p.mtl.apply();
       this.transformProgramUniforms(p.mtl.shader);
       p.render(this.timer);
     }

@@ -5,23 +5,16 @@ import { shader } from "../shd/shader.js";
 import { mat4 } from "../mth/mat4.js";
 import { vec3 } from "../mth/vec3.js";
 
-class _material {
-  constructor(shd, ubo) {
-    this.shader = shd;
-    this.ubo = ubo;
-  }
-}
-
 class _prim {
-  constructor(gl, name, type, shd_name, pos, VBuf, IBuf, VA, noofI, noofV, side) {
+  constructor(gl, name, type, mtl, pos, VBuf, IBuf, VA, noofI, noofV, side) {
     this.name = name;
     (this.VBuf = VBuf), (this.IBuf = IBuf), (this.VA = VA); /* render info */
     this.type = type; /* platon figure type */
     this.pos = pos; /* position */
 
     this.side = side;
-    let shd = shader(shd_name, gl);
-    this.mtl = new _material(shd, null);
+    //let shd = shader(shd_name, gl);
+    this.mtl = mtl;
     this.shdIsLoaded = null;
     this.noofI = noofI;
     this.noofV = noofV;
@@ -29,17 +22,23 @@ class _prim {
     this.matrWourld = mat4();
   }
 
-  updatePrimData(timer) {
+  texAttach(url, gl, type = "2d") {
+    this.mtl.textureAttach(url, type, gl);
+  }
 
-    if (this.mtl.shader.uniforms["matrWorld"] == undefined)
-      return;
+  updatePrimData(timer) {
+    if (this.mtl.shader.uniforms["matrWorld"] == undefined) return;
     let mr, m1;
     if (this.type == "earth") {
-      m1 = mat4().matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime)).matrMulMatr2(mat4().matrScale(vec3(3, 3, 3)));  
-    }
-    else {
+      m1 = mat4()
+        .matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime))
+        .matrMulMatr2(mat4().matrScale(vec3(3, 3, 3)));
+    } else {
       mr = mat4().matrScale(vec3(this.side));
-      m1 = mat4().matrTranslate(this.pos).matrMulMatr2(mr).matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime));
+      m1 = mat4()
+        .matrTranslate(this.pos)
+        .matrMulMatr2(mr)
+        .matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime));
     }
     let arr1 = m1.toArray();
     let mWLoc = this.mtl.shader.uniforms["matrWorld"].loc;
@@ -76,7 +75,7 @@ class _prim {
       }
       gl.bindVertexArray(this.VA.id);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.VBuf.id);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.noofV);
+      gl.drawArrays(gl.LINE_STRIP, 0, this.noofV);
     }
   }
 }
@@ -91,7 +90,7 @@ export function vrt(pos, norm) {
   return new _vertex(pos, norm);
 }
 
-export function primCreate(name, type, mtl, pos, side=3, gl) {
+export function primCreate(name, type, mtl, pos, side = 3, gl) {
   let vi;
   if (type == "cube") vi = cubeCreate();
   if (type == "earth") vi = earthCreate();
@@ -100,11 +99,12 @@ export function primCreate(name, type, mtl, pos, side=3, gl) {
 
   let vertexArray = gl.createVertexArray();
   gl.bindVertexArray(vertexArray);
-  let vertexBuffer = vertex_buffer(vert, gl), indexBuffer, indlen;
+  let vertexBuffer = vertex_buffer(vert, gl),
+    indexBuffer,
+    indlen;
 
-  if (ind != null)
-    indexBuffer = index_buffer(ind, gl), indlen = ind.length;
-  else indexBuffer = null, indlen = null;
+  if (ind != null) (indexBuffer = index_buffer(ind, gl)), (indlen = ind.length);
+  else (indexBuffer = null), (indlen = null);
 
   return new _prim(
     gl,
