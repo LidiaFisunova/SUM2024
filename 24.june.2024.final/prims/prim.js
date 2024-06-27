@@ -29,7 +29,7 @@ class _prim {
   updatePrimData(timer) {
     if (this.mtl.shader.uniforms["matrWorld"] == undefined) return;
     let mr, m1;
-    if (this.type == "earth") {
+    if (this.type == "earth" || this.type == "clouds") {
       m1 = mat4()
         .matrMulMatr2(mat4().matrRotateY(30 * timer.globalTime))
         .matrMulMatr2(mat4().matrScale(vec3(3, 3, 3)));
@@ -47,34 +47,22 @@ class _prim {
 
   render(timer) {
     let gl = this.gl;
-    if (this.noofI != null) {
-      if (this.mtl.shdIsLoaded == null) {
-        this.updatePrimData(timer);
-        if (this.mtl.shader.attrs["InNormal"] == undefined)
-          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 12, 0);
-        else {
-          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
-          this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
-        }
-        this.mtl.shader.updateShaderData();
-      }
+    gl.bindVertexArray(this.VA);
+    if (this.shdIsLoaded == null) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.VBuf.id);
-      gl.bindVertexArray(this.VA.id);
+      if (this.mtl.shader.attrs["InNormal"] != undefined) {
+        this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 12, 0);
+        this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
+      }
+      else this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 16, 0);
+      // this.mtl.shader.updateShaderData();
+    }
+    this.updatePrimData(timer);
+
+    if (this.noofI != null) {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.IBuf.id);
       gl.drawElements(gl.TRIANGLE_STRIP, this.noofI, gl.UNSIGNED_INT, 0);
     } else {
-      if (this.mtl.shdIsLoaded == null) {
-        this.updatePrimData(timer);
-        if (this.mtl.shader.attrs["InNormal"] == undefined)
-          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 12, 0);
-        else {
-          this.VBuf.apply(this.mtl.shader.attrs["InPosition"].loc, 24, 0);
-          this.VBuf.apply(this.mtl.shader.attrs["InNormal"].loc, 24, 12);
-        }
-        this.mtl.shader.updateShaderData();
-      }
-      gl.bindVertexArray(this.VA.id);
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.VBuf.id);
       gl.drawArrays(gl.LINE_STRIP, 0, this.noofV);
     }
   }
@@ -93,9 +81,11 @@ export function vrt(pos, norm) {
 export function primCreate(name, type, mtl, pos, side = 3, gl) {
   let vi;
   if (type == "cube") vi = cubeCreate();
-  if (type == "earth") vi = earthCreate();
+  if (type == "earth") vi = earthCreate(name);
   let vert = vi[0],
-    ind = vi[1];
+    ind = vi[1],
+    w = vi[2],
+    h = vi[3];
 
   let vertexArray = gl.createVertexArray();
   gl.bindVertexArray(vertexArray);
@@ -106,7 +96,7 @@ export function primCreate(name, type, mtl, pos, side = 3, gl) {
   if (ind != null) (indexBuffer = index_buffer(ind, gl)), (indlen = ind.length);
   else (indexBuffer = null), (indlen = null);
 
-  return new _prim(
+  let pr = new _prim(
     gl,
     name,
     type,
@@ -119,4 +109,7 @@ export function primCreate(name, type, mtl, pos, side = 3, gl) {
     vert.length,
     side
   );
+  pr.w = w;
+  pr.h = h;
+  return pr;
 }

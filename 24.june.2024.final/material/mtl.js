@@ -1,5 +1,5 @@
-import { shader } from "../shd/shader";
-import { texture } from "../texture/tex";
+import { shader } from "../shd/shader.js";
+import { texture } from "../texture/tex.js";
 
 class _material {
   constructor(shd_name, ubo, gl) {

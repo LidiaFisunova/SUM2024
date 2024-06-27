@@ -1,4 +1,4 @@
-import {vec3} from "./vec3"
+import {vec3} from "./vec3.js"
 
 class _mat4 {
   constructor() {

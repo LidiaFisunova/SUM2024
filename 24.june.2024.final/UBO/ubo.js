@@ -52,7 +52,7 @@ class _vertex_buffer extends _buffer {
     );
   }
   apply(Loc, size, offset) {
-    this.gl.vertexAttribPointer(Loc, 3, this.gl.FLOAT, false, size, offset);
+    this.gl.vertexAttribPointer(Loc, size / 4, this.gl.FLOAT, false, size, offset);
     this.gl.enableVertexAttribArray(Loc);
   }
 }

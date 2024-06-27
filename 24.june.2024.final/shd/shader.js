@@ -18,7 +18,7 @@ class _shader {
       },
     ];
     for (const s of this.shaders) {
-      let response = await fetch(`bin/shaders/${name}/${s.name}.glsl`);
+      let response = await fetch(`bin/shaders/${name}/${s.name}.glsl?${Math.random()}`);
       let src = await response.text();
       if (typeof src == "string" && src != "") s.src = src;
     }

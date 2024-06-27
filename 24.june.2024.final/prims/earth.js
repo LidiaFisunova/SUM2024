@@ -1,7 +1,9 @@
-export function earthCreate() {
+import { getGeoData } from "../main";
+
+export function earthCreate(name) {
   let vertexes = [],
-    w = 100,
-    h = 100,
+    w = name == "Earth" ? 30 : 200,
+    h = name == "Earth" ? 18 : 100,
     i,
     j,
     theta,
@@ -9,14 +11,26 @@ export function earthCreate() {
     G = [],
     ind = [],
     x,
-    y;
-  let pi = Math.acos(-1);
+    y,
+    R;
+  let pi = Math.acos(-1),
+    z;
+
+  R = name == "Earth" ? 1 : 1.1;
 
   for (i = 0, theta = 0; i < h; i++, theta += pi / (h - 1)) {
     for (j = 0, phi = 0; j < w; j++, phi += (2 * pi) / (w - 1)) {
-      G[0] = Math.sin(theta) * Math.sin(phi);
-      G[1] = Math.cos(theta);
-      G[2] = Math.sin(theta) * Math.cos(phi);
+      //G[0] = Math.sin(theta) * Math.sin(phi);
+      //G[1] = Math.cos(theta);
+      //G[2] = Math.sin(theta) * Math.cos(phi);
+      G[0] = j / (w - 1);
+      G[1] = i / (h - 1);
+      if (name == "Earth") z = 0;
+      else {
+        z = 0; // 50 + 30 * Math.sin((i * w + j) / 2.0); // getGeoData((Math.sin(theta) * Math.sin(phi)) * 180 / pi - Math.acos(-1) * 180 / pi, Math.cos(theta) * 180 / pi);
+      }
+      G[2] = R;
+      G[3] = z;
       vertexes = vertexes.concat(...G);
     }
   }
@@ -35,5 +49,20 @@ export function earthCreate() {
       x++;
     }
   }
-  return [vertexes, ind];
+
+  ind = [];
+  for (let i = 0, k = 0; i < h - 1; i++)
+  {
+    for (let j = 0; j < w; j++)
+    {
+      ind.push((i + 1) * w + j);
+      ind.push(i * w + j);
+    }
+    if (i != h - 2)
+      ind.push(-1);
+  }
+
+
+
+  return [vertexes, ind, w, h];
 }

@@ -1,5 +1,5 @@
-import { vec3 } from "./vec3";
-import { mat4 } from "./mat4";
+import { vec3 } from "./vec3.js";
+import { mat4 } from "./mat4.js";
 
 class _camera {
   constructor(w, h) {
